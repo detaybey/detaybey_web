@@ -15,7 +15,7 @@ section {
   align-items: center;
   justify-content: center;
 }
-#cubeLabel {
+#label {
     font-family: 'JetBrains Mono', monospace;
     font-size: 49px;
     font-weight: bolder;
