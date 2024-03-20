@@ -14,6 +14,7 @@
             height: 100vh;
             overflow: hidden;
             background: linear-gradient(#000044, #002299);
+            font-family: "Fira Mono", monospace;
         }
 
         canvas {
@@ -28,24 +29,41 @@
             bottom: 10px;
             right: 10px;
             background-color: #ffcc00;
-            padding: 3px 10px 3px 10px;
-            border-radius: 3px;
-            font-family: "Fira Mono", monospace;
+            padding: 4px 10px 3px 10px;
+            border-radius: 3px;            
             font-weight: 100;
             font-style: normal;
             font-size: 10px;
             border: solid 1px #000;
         }
+        #game {
+            display: flex;
+            flex-direction: row;
+        }
+        .score {
+            width: 140px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 50px;
+            font-weight: 900;
+            color:#fff;
+        }
     </style>
 </head>
 <body>
-    <canvas id="breakerCanvas" width="400" height="400"></canvas>
+    <div id="game">
+        <div id="score0" class="score">4</div>
+        <canvas id="breakerCanvas" width="400" height="400"></canvas>
+        <div id="score1" class="score">4</div>
+    </div>
     <div id="water"></div>
     <div id="author">detaybey</div>
     <script>
         const canvas = document.getElementById('breakerCanvas');
         const ctx = canvas.getContext('2d');
-
+        var scores = [10,11];
         const PADDLE_WIDTH = 100;
         const PADDLE_HEIGHT = 20;
         const BALL_SIZE = 10;
@@ -95,10 +113,12 @@
 
                 if (ball.x < BALL_SIZE || ball.x + BALL_SIZE > canvas.width) {
                     ball.dx = -ball.dx;
+                    ball.x += ball.dx * 3 + Math.random() * 2
                 }
 
                 if (ball.y < BALL_SIZE || ball.y + BALL_SIZE > canvas.height) {
                     ball.dy = -ball.dy;
+                    ball.y += ball.dy * 3 + Math.random() * 2
                 }
 
                 for (let y = 0; y < BRICK_ROWS; y++) {
@@ -120,6 +140,7 @@
                 }
 
                 checkBallCollision();
+                getScore();
             });
         }
 
@@ -135,7 +156,7 @@
                 let ny = dy / distance;
 
                 // Increase the separation distance
-                let separationDistance = BALL_SIZE / 2;
+                let separationDistance = BALL_SIZE * 2;
 
                 // Separate the balls more aggressively to prevent sticking
                 balls[0].x -= nx * separationDistance;
@@ -151,6 +172,19 @@
             }
         }
 
+        function getScore() {
+            scores[1]= BRICK_MAP.filter(x=> x==0).length;
+            scores[0]= BRICK_MAP.filter(x=> x==1).length;
+            document.getElementById('score0').style.color = WHITE;
+            document.getElementById('score0').style.webkitTextStrokeColor = BLACK;
+            document.getElementById('score0').style.webkitTextStrokeWidth = '2px';
+            document.getElementById('score0').innerText = scores[0].toString().padStart(3, '0');
+            
+            document.getElementById('score1').style.color = BLACK;
+            document.getElementById('score1').style.webkitTextStrokeColor = WHITE;
+            document.getElementById('score1').style.webkitTextStrokeWidth = '2px';
+            document.getElementById('score1').innerText = scores[1].toString().padStart(3, '0');
+        }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
