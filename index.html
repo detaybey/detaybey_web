@@ -28,12 +28,12 @@
             bottom: 10px;
             right: 10px;
             background-color: #ffcc00;
-            padding: 3px 10px 3px 10px;
+            padding: 3px 8px 3px 8px;
             border-radius: 3px;
             font-family: "Fira Mono", monospace;
             font-weight: 100;
             font-style: normal;
-            font-size: 10px;
+            font-size: 9px;
             border: solid 1px #000;
         }
     </style>
@@ -127,16 +127,12 @@
             let dy = balls[1].y - balls[0].y;
             let distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance < BALL_SIZE * 2) {
+            if (distance < BALL_SIZE * 3) {
                 balls[0].dx = -balls[0].dx;
-                balls[0].dy = -balls[0].dy;
-                balls[1].dx = -balls[1].dx;
                 balls[1].dy = -balls[1].dy;
 
                 // Adjust positions to avoid sticky collision
                 balls[0].x += balls[0].dx;
-                balls[0].y += balls[0].dy;
-                balls[1].x += balls[1].dx;
                 balls[1].y += balls[1].dy;
             }
         }
