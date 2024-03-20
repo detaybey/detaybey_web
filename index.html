@@ -118,7 +118,27 @@
                     }
                 }
 
+                checkBallCollision();
             });
+        }
+
+        function checkBallCollision() {
+            let dx = balls[1].x - balls[0].x;
+            let dy = balls[1].y - balls[0].y;
+            let distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < BALL_SIZE * 2) {
+                balls[0].dx = -balls[0].dx;
+                balls[0].dy = -balls[0].dy;
+                balls[1].dx = -balls[1].dx;
+                balls[1].dy = -balls[1].dy;
+
+                // Adjust positions to avoid sticky collision
+                balls[0].x += balls[0].dx;
+                balls[0].y += balls[0].dy;
+                balls[1].x += balls[1].dx;
+                balls[1].y += balls[1].dy;
+            }
         }
 
         function draw() {
