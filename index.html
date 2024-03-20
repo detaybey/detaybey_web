@@ -1,26 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <title>.:'</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;800&display=swap" rel="stylesheet">
-    <link href="index.css" rel="stylesheet">    
-    <title>detaybey.com</title>
-    <script type="text/javascript">
-      (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "jcbtx6c432");
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        html, body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(#000044, #002299);
+        }
+
+        canvas {
+            background: #eee;
+            display: block;
+            margin: 0 auto;
+            border: solid 2px #000;
+            border-radius: 10px;
+        }
+        #author {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #ffcc00;
+            padding: 3px 10px 3px 10px;
+            border-radius: 3px;
+            font-family: "Fira Mono", monospace;
+            font-weight: 100;
+            font-style: normal;
+            font-size: 10px;
+            border: solid 1px #000;
+        }
+    </style>
 </head>
 <body>
-  <section>
-    <div id="label">:)</section>
-  </section>
-  <script src="index.js"></script>
+    <canvas id="breakerCanvas" width="400" height="400"></canvas>
+    <div id="author">detaybey</div>
+    <script>
+        const canvas = document.getElementById('breakerCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const PADDLE_WIDTH = 100;
+        const PADDLE_HEIGHT = 20;
+        const BALL_SIZE = 10;
+        const BRICK_ROWS = 16;
+        const BRICK_COLS = 16;
+        const BRICK_WIDTH = Math.round(canvas.width / BRICK_COLS);
+        const BRICK_HEIGHT = Math.round(canvas.height / BRICK_ROWS);
+        const WHITE = '#FFFFFF';
+        const BLACK = '#000000';
+        const BRICK_MAP = [
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+            1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,
+        ]
+
+        const ox1 = (canvas.width / 2) - (canvas.width / 4) - Math.random()*15;
+        const ox2 = (canvas.width / 2) + (canvas.width / 4) + Math.random()*15;
+        const oy1 = (canvas.height / 2) - Math.random()*15;
+        const oy2 = (canvas.height / 2) + Math.random()*15;
+        
+        const ballSpeed = 5;
+        
+        let balls = [
+            { x: ox1, y: oy1, dx: ballSpeed, dy: -1*ballSpeed, color: BLACK },
+            { x: ox2, y: oy2, dx: -1*ballSpeed, dy: ballSpeed, color: WHITE }
+        ];
+
+  
+        // Move balls and check for collisions
+        function moveBalls() {
+            balls.forEach(ball => {
+                ball.x += ball.dx;
+                ball.y += ball.dy;
+
+                if (ball.x < BALL_SIZE || ball.x + BALL_SIZE > canvas.width) {
+                    ball.dx = -ball.dx;
+                }
+
+                if (ball.y < BALL_SIZE || ball.y + BALL_SIZE > canvas.height) {
+                    ball.dy = -ball.dy;
+                }
+
+                for (let y = 0; y < BRICK_ROWS; y++) {
+                    for (let x = 0; x < BRICK_COLS; x++) {
+                        const brickColor = BRICK_MAP[x + (y*BRICK_COLS)] == 1 ? WHITE: BLACK;
+                        if (ball.color != brickColor) { continue;}
+
+                        const brickX = x * BRICK_WIDTH;
+                        const brickY = y * BRICK_HEIGHT;
+                        if (ball.x + BALL_SIZE >= brickX && ball.x - BALL_SIZE <= brickX + BRICK_WIDTH &&
+                            ball.y + BALL_SIZE >= brickY && ball.y - BALL_SIZE <= brickY + BRICK_HEIGHT) {
+                            const hitFromLeftOrRight = (ball.x + BALL_SIZE <= brickX + BRICK_WIDTH/2) || (ball.x - BALL_SIZE >= brickX + BRICK_WIDTH/2);
+                            const hitFromTopOrBottom = (ball.y + BALL_SIZE <= brickY + BRICK_HEIGHT/2) || (ball.y - BALL_SIZE >= brickY + BRICK_HEIGHT/2);
+                            if (hitFromLeftOrRight) { ball.dx = -ball.dx; }
+                            if (hitFromTopOrBottom) { ball.dy = -ball.dy; }
+                            BRICK_MAP[x + (y*BRICK_COLS)] = brickColor == WHITE ? 0 : 1;
+                        }
+                    }
+                }
+
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < BRICK_ROWS; y++) {
+                for (let x = 0; x < BRICK_COLS; x++) {
+                    ctx.fillStyle = BRICK_MAP[x + (y*BRICK_COLS)] == 1 ? WHITE: BLACK;
+                    ctx.fillRect(x*BRICK_WIDTH, y * BRICK_HEIGHT, BRICK_WIDTH, BRICK_HEIGHT);
+                }
+            }
+            balls.forEach(ball => {
+                ctx.beginPath();
+                ctx.arc(ball.x, ball.y, BALL_SIZE, 0, Math.PI*2);
+                ctx.fillStyle = ball.color;
+                ctx.fill();
+                ctx.closePath();
+            });
+            moveBalls();
+        }
+
+        function gameLoop() {
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        gameLoop();
+    </script>
 </body>
 </html>
