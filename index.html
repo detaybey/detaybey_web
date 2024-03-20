@@ -18,7 +18,7 @@
         }
 
         canvas {
-            background: #eee;
+            background: #000;
             display: block;
             margin: 0 auto;
             border: solid 2px #000;
@@ -34,11 +34,12 @@
             font-weight: 100;
             font-style: normal;
             font-size: 10px;
+            font-weight: 400;
             border: solid 1px #000;
         }
         #game {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
         }
         .score {
             width: 140px;
@@ -46,17 +47,27 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 50px;
-            font-weight: 900;
+            font-size: 10px;
+            font-weight: 100;
             color:#fff;
+        }
+        #scores {
+            display: flex;
+            flex-direction: row;
+            padding: 1px;
+            margin: 0;
+            padding: 10px;
+            width: 400px;
         }
     </style>
 </head>
 <body>
     <div id="game">
-        <div id="score0" class="score">4</div>
+        <div id="scores">
+            <div id="score0" class="score">.</div>
+            <div id="score1" class="score">.</div>
+        </div>
         <canvas id="breakerCanvas" width="400" height="400"></canvas>
-        <div id="score1" class="score">4</div>
     </div>
     <div id="water"></div>
     <div id="author">detaybey</div>
@@ -100,11 +111,25 @@
         const ballSpeed = 5;
         
         let balls = [
-            { x: ox1, y: oy1, dx: ballSpeed, dy: -1*ballSpeed, color: BLACK },
-            { x: ox2, y: oy2, dx: -1*ballSpeed, dy: ballSpeed, color: WHITE }
+            { x: ox1, y: oy1, dx: ballSpeed, dy: -1*ballSpeed, color: BLACK, history: [] },
+            { x: ox2, y: oy2, dx: -1*ballSpeed, dy: ballSpeed, color: WHITE, history: [] }
         ];
+        
+        function isStuck(ball) {
+            if (ball.history.length < 5) return false;
 
-  
+            // Check for oscillating pattern
+            for (let i = 1; i < ball.history.length; i++) {
+                if (ball.history[i].dx !== -ball.history[i-1].dx ||
+                    ball.history[i].dy !== -ball.history[i-1].dy) {
+                    return false;
+                }
+            }
+
+            console.log('stuck!');
+            return true;
+        }
+
         // Move balls and check for collisions
         function moveBalls() {
             balls.forEach(ball => {
@@ -149,47 +174,46 @@
             let dy = balls[1].y - balls[0].y;
             let distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Check if the balls are colliding and are moving towards each other
+            // Check if the balls are colliding
             if (distance < BALL_SIZE * 2) {
+                // Calculate collision response directions
                 let nx = dx / distance;
                 let ny = dy / distance;
-                let p = 2 * (balls[0].dx * nx + balls[0].dy * ny - balls[1].dx * nx - balls[1].dy * ny) / 2;
 
-                // Check if the balls are moving towards each other
-                let areBallsMovingTowardsEachOther = (balls[0].dx - balls[1].dx) * nx + (balls[0].dy - balls[1].dy) * ny < 0;
+                // Increase the separation distance
+                let separationDistance = BALL_SIZE * 3;
 
-                if (areBallsMovingTowardsEachOther) {
-                    // Reflect velocities
-                    balls[0].dx -= p * nx;
-                    balls[0].dy -= p * ny;
-                    balls[1].dx += p * nx;
-                    balls[1].dy += p * ny;
+                // Separate the balls more aggressively to prevent sticking
+                balls[0].x -= nx * separationDistance;
+                balls[0].y -= ny * separationDistance;
+                balls[1].x += nx * separationDistance;
+                balls[1].y += ny * separationDistance;
 
-                    // Increase the separation distance
-                    let separationDistance = (BALL_SIZE * 2 - distance) / 2 + 1; // A little extra push to separate them
-
-                    // Separate the balls to prevent sticking
-                    balls[0].x -= nx * separationDistance;
-                    balls[0].y -= ny * separationDistance;
-                    balls[1].x += nx * separationDistance;
-                    balls[1].y += ny * separationDistance;
-                }
+                // Invert the velocities
+                balls[0].dx = -balls[0].dx;
+                balls[0].dy = -balls[0].dy;
+                balls[1].dx = -balls[1].dx;
+                balls[1].dy = -balls[1].dy;
             }
         }
 
-
         function getScore() {
+
             scores[1]= BRICK_MAP.filter(x=> x==0).length;
             scores[0]= BRICK_MAP.filter(x=> x==1).length;
-            document.getElementById('score0').style.color = WHITE;
-            document.getElementById('score0').style.webkitTextStrokeColor = BLACK;
-            document.getElementById('score0').style.webkitTextStrokeWidth = '2px';
-            document.getElementById('score0').innerText = scores[0].toString().padStart(3, '0');
-            
-            document.getElementById('score1').style.color = BLACK;
-            document.getElementById('score1').style.webkitTextStrokeColor = WHITE;
-            document.getElementById('score1').style.webkitTextStrokeWidth = '2px';
-            document.getElementById('score1').innerText = scores[1].toString().padStart(3, '0');
+
+            const score0 = scores[0] * 400 / 256;
+            const score1 = scores[1] * 400 / 256;
+
+            document.getElementById('score0').innerText = scores[0];
+            document.getElementById('score0').style.color = BLACK;
+            document.getElementById('score0').style.backgroundColor = WHITE;
+            document.getElementById('score0').style.width = score0 + 'px';
+
+            document.getElementById('score1').style.color = WHITE;
+            document.getElementById('score1').style.backgroundColor = BLACK;
+            document.getElementById('score1').innerText = scores[1];
+            document.getElementById('score1').style.width = score1 + 'px';
         }
 
         function draw() {
