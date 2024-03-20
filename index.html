@@ -149,28 +149,34 @@
             let dy = balls[1].y - balls[0].y;
             let distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Check if the balls are colliding
+            // Check if the balls are colliding and are moving towards each other
             if (distance < BALL_SIZE * 2) {
-                // Calculate collision response directions
                 let nx = dx / distance;
                 let ny = dy / distance;
+                let p = 2 * (balls[0].dx * nx + balls[0].dy * ny - balls[1].dx * nx - balls[1].dy * ny) / 2;
 
-                // Increase the separation distance
-                let separationDistance = BALL_SIZE * 3;
+                // Check if the balls are moving towards each other
+                let areBallsMovingTowardsEachOther = (balls[0].dx - balls[1].dx) * nx + (balls[0].dy - balls[1].dy) * ny < 0;
 
-                // Separate the balls more aggressively to prevent sticking
-                balls[0].x -= nx * separationDistance;
-                balls[0].y -= ny * separationDistance;
-                balls[1].x += nx * separationDistance;
-                balls[1].y += ny * separationDistance;
+                if (areBallsMovingTowardsEachOther) {
+                    // Reflect velocities
+                    balls[0].dx -= p * nx;
+                    balls[0].dy -= p * ny;
+                    balls[1].dx += p * nx;
+                    balls[1].dy += p * ny;
 
-                // Invert the velocities
-                balls[0].dx = -balls[0].dx;
-                balls[0].dy = -balls[0].dy;
-                balls[1].dx = -balls[1].dx;
-                balls[1].dy = -balls[1].dy;
+                    // Increase the separation distance
+                    let separationDistance = (BALL_SIZE * 2 - distance) / 2 + 1; // A little extra push to separate them
+
+                    // Separate the balls to prevent sticking
+                    balls[0].x -= nx * separationDistance;
+                    balls[0].y -= ny * separationDistance;
+                    balls[1].x += nx * separationDistance;
+                    balls[1].y += ny * separationDistance;
+                }
             }
         }
+
 
         function getScore() {
             scores[1]= BRICK_MAP.filter(x=> x==0).length;
