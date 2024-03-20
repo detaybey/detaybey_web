@@ -114,20 +114,19 @@
             { x: ox1, y: oy1, dx: ballSpeed, dy: -1*ballSpeed, color: BLACK, history: [] },
             { x: ox2, y: oy2, dx: -1*ballSpeed, dy: ballSpeed, color: WHITE, history: [] }
         ];
-        
-        function isStuck(ball) {
-            if (ball.history.length < 5) return false;
 
-            // Check for oscillating pattern
-            for (let i = 1; i < ball.history.length; i++) {
-                if (ball.history[i].dx !== -ball.history[i-1].dx ||
-                    ball.history[i].dy !== -ball.history[i-1].dy) {
-                    return false;
+
+        function isStuck(ball) {
+            if (ball.history.length > 10) { // Keep only the last 5 entries
+                ball.history.shift();
+            }
+            for (let i = 0; i < ball.history.length; i++) {
+                if (ball.history[i].x === ball.x && ball.history[i].y === ball.y) {
+                    return true; 
                 }
             }
-
-            console.log('stuck!');
-            return true;
+            ball.history.push({ x: ball.x, y: ball.y});
+            return false; 
         }
 
         // Move balls and check for collisions
@@ -135,15 +134,12 @@
             balls.forEach(ball => {
                 ball.x += ball.dx;
                 ball.y += ball.dy;
-
-                if (ball.x < BALL_SIZE || ball.x + BALL_SIZE > canvas.width) {
-                    ball.dx = -ball.dx;
-                    ball.x += ball.dx * 3 + Math.random() * 2
-                }
-
-                if (ball.y < BALL_SIZE || ball.y + BALL_SIZE > canvas.height) {
-                    ball.dy = -ball.dy;
-                    ball.y += ball.dy * 3 + Math.random() * 2
+                
+                const stuck = isStuck(ball);
+                if (stuck) {
+                    console.log('stuck! moving!');
+                    ball.x = ball.x + ball.dx * 3
+                    ball.y = ball.y + ball.dx * 3
                 }
 
                 for (let y = 0; y < BRICK_ROWS; y++) {
@@ -162,6 +158,16 @@
                             BRICK_MAP[x + (y*BRICK_COLS)] = brickColor == WHITE ? 0 : 1;
                         }
                     }
+                }
+
+                if (ball.x < BALL_SIZE || ball.x + BALL_SIZE > canvas.width) {
+                    ball.dx = -ball.dx;
+                    ball.x += ball.dx * 3 + Math.random() * 2
+                }
+
+                if (ball.y < BALL_SIZE || ball.y + BALL_SIZE > canvas.height) {
+                    ball.dy = -ball.dy;
+                    ball.y += ball.dy * 3 + Math.random() * 2
                 }
 
                 checkBallCollision();
@@ -201,7 +207,6 @@
 
             scores[1]= BRICK_MAP.filter(x=> x==0).length;
             scores[0]= BRICK_MAP.filter(x=> x==1).length;
-
             const score0 = scores[0] * 400 / 256;
             const score1 = scores[1] * 400 / 256;
 
