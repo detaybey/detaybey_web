@@ -159,20 +159,14 @@
                     }
                 }
 
-                if (ball.x < BALL_SIZE) {
+                if (ball.x < BALL_SIZE || (ball.x + BALL_SIZE) > canvas.width) {
                     ball.dx = -ball.dx;
-                    ball.x += ball.dx * 3 + Math.random() * 2
-                }else if ((ball.x + BALL_SIZE) > canvas.width) {
-                    ball.dx = -ball.dx;
-                    ball.x -= ball.dx * 3 + Math.random() * 2
+                    ball.x += ball.dx * 3 + Math.random() * 2;
                 }
 
-                if (ball.y < canvas.height) {
+                if (ball.y < canvas.height || (ball.y + BALL_SIZE) > canvas.height) {
                     ball.dy = -ball.dy;
-                    ball.y -= ball.dy * 3 + Math.random() * 2
-                } else if ((ball.y + BALL_SIZE) > canvas.height) {
-                    ball.dy = -ball.dy;
-                    ball.y += ball.dy * 3 + Math.random() * 2
+                    ball.y -= ball.dy * 3 + Math.random() * 2;
                 }
 
                 checkBallCollision();
