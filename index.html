@@ -159,6 +159,9 @@
                     }
                 }
 
+                checkBallCollision();
+                getScore();
+                
                 if (ball.x < BALL_SIZE || ball.x + BALL_SIZE > canvas.width) {
                     ball.dx = -ball.dx;
                     ball.x += ball.dx * 3 + Math.random() * 2
@@ -169,8 +172,14 @@
                     ball.y += ball.dy * 3 + Math.random() * 2
                 }
 
-                checkBallCollision();
-                getScore();
+                if (ball.x < 0 || ball.x> canvas.width) {
+                    ball.dx = -ball.dx;
+                }
+
+                if (ball.y < 0 || ball.y> canvas.height) {
+                    ball.dy = -ball.dy;
+                }
+
             });
         }
 
