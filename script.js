@@ -11,6 +11,12 @@ class Ball {
 	move() {
 			this.x += this.dx;
 			this.y += this.dy;
+			if (this.isStuck()) {
+					console.log('stuck! moving!');
+					this.x = this.x + this.dx * Math.random()*3
+					this.y = this.y + this.dx * Math.random()*3
+			}
+
 	}
 
 	draw(ctx) {
@@ -60,17 +66,23 @@ class Ball {
 	}
 
 	isStuck() {
-			if (this.history.length > 10) {
-					this.history.shift();
-			}
-			for (let i = 0; i < this.history.length; i++) {
-					if (this.history[i].x === this.x && this.history[i].y === this.y) {
-							return true;
-					}
-			}
-			this.history.push({ x: this.x, y: this.y });
-			return false;
-	}
+    if (this.history.length > 10) {
+        this.history.shift();
+    }
+    
+    let repeatCounter = 0;
+    for (let i = 0; i < this.history.length; i++) {
+        if (this.history[i].x === this.x && this.history[i].y === this.y) {
+            repeatCounter++;
+            if (repeatCounter > 1) { // If the same coordinate repeats more than once, return true
+                return true;
+            }
+        }
+    }
+    
+    this.history.push({ x: this.x, y: this.y });
+    return false;
+}
 }
 
 const canvas = document.getElementById('breakerCanvas');
