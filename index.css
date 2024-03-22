@@ -1,26 +1,52 @@
-html { overflow: hidden; }
-body { margin: 0; }
-canvas { 
-  display: block;
-  position: absolute; 
-  z-index: 99;
-  top:0;
+html, body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	overflow: hidden;
+	background: linear-gradient(#000044, #002299);
+	font-family: "Fira Mono", monospace;
 }
-section {
-  position: absolute;
-  width: 100vw;
-  height: 100vh;
-  z-index: 100;
-  display: grid;
-  align-items: center;
-  justify-content: center;
+
+canvas {
+	background: #000;
+	display: block;
+	margin: 0 auto;
+	border: solid 2px #000;
+	border-radius: 10px;
 }
-#label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 49px;
-    font-weight: bolder;
-    color: rgba(255, 255, 255, 0.7);
-    -webkit-text-stroke-width: 0.5px;
-    -webkit-text-stroke-color: #000;
-    -webkit-text-fill-color: #fff;
+#author {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	background-color: #ffcc00;
+	padding: 4px 10px 3px 10px;
+	border-radius: 3px;            
+	font-weight: 100;
+	font-style: normal;
+	font-size: 10px;
+	font-weight: 400;
+	border: solid 1px #000;
+}
+#game {
+	display: flex;
+	flex-direction: column;
+}
+.score {
+	width: 140px;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 10px;
+	font-weight: 100;
+	color:#fff;
+}
+#scores {
+	display: flex;
+	flex-direction: row;
+	padding: 1px;
+	margin: 0;
+	padding: 10px;
+	width: 400px;
 }
